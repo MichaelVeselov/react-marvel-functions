@@ -1,35 +1,27 @@
-class MarvelService {
-  #apiBase = 'https://gateway.marvel.com:443/v1/public/';
-  #apiKey = 'd371ed7ea24992441e33620ff22a8cf2';
-  #defaultOffset = 210;
+import { useHttp } from '../hooks/http.hook';
 
-  getResource = async (url) => {
-    let response = await fetch(url);
+const useMarvelService = () => {
+  const _apiBase = 'https://gateway.marvel.com:443/v1/public/';
+  const _apiKey = 'd371ed7ea24992441e33620ff22a8cf2';
+  const _defaultOffset = 210;
 
-    if (!response.ok) {
-      throw new Error(`Could not fetch ${url}, status: ${response.status}`);
-    }
+  const { request, loading, error, clearError } = useHttp();
 
-    return await response.json();
-  };
-
-  getAllCharacters = async (offset = this.#defaultOffset) => {
-    const response = await this.getResource(
-      `${this.#apiBase}characters?limit=9&offset=${offset}&apikey=${
-        this.#apiKey
-      }`
+  const getAllCharacters = async (offset = _defaultOffset) => {
+    const response = await request(
+      `${_apiBase}characters?limit=9&offset=${offset}&apikey=${_apiKey}`
     );
-    return response.data.results.map((char) => this.#transformCharacter(char));
+    return response.data.results.map((char) => _transformCharacter(char));
   };
 
-  getCharacter = async (id) => {
-    const response = await this.getResource(
-      `${this.#apiBase}characters/${id}?apikey=${this.#apiKey}`
+  const getCharacter = async (id) => {
+    const response = await request(
+      `${_apiBase}characters/${id}?apikey=${_apiKey}`
     );
-    return this.#transformCharacter(response.data.results[0]);
+    return _transformCharacter(response.data.results[0]);
   };
 
-  #transformCharacter = (char) => {
+  const _transformCharacter = (char) => {
     return {
       id: char.id,
       name: char.name,
@@ -42,6 +34,8 @@ class MarvelService {
       comics: char.comics.items,
     };
   };
-}
 
-export default MarvelService;
+  return { loading, error, getAllCharacters, getCharacter, clearError };
+};
+
+export default useMarvelService;

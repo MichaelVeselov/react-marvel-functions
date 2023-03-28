@@ -3,7 +3,7 @@ import './charInfo.scss';
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
 import Spinner from '../Spinner/Spinner';
@@ -12,40 +12,25 @@ import Skeleton from '../Skeleton/Skeleton';
 const CharInfo = (props) => {
   const { charId } = props;
 
-  const [char, setChar] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const { loading, error, getCharacter, clearError } = useMarvelService();
 
-  const marvelService = new MarvelService();
+  const [char, setChar] = useState(null);
 
   useEffect(() => {
     updateChar();
     // eslint-disable-next-line
   }, [charId]);
 
-  const onCharLoading = () => {
-    setLoading(true);
-  };
-
   const onCharLoaded = (char) => {
     setChar(char);
-    setLoading(false);
-  };
-
-  const onError = () => {
-    setLoading(false);
-    setError(true);
   };
 
   const updateChar = () => {
     if (!charId) return;
 
-    onCharLoading();
+    clearError();
 
-    marvelService
-      .getCharacter(charId)
-      .then((response) => onCharLoaded(response))
-      .catch(onError);
+    getCharacter(charId).then((response) => onCharLoaded(response));
   };
 
   const skeleton = char || loading || error ? null : <Skeleton />;
@@ -66,7 +51,7 @@ const CharInfo = (props) => {
 const View = ({ char }) => {
   const { name, description, thumbnail, homepage, wiki, comics } = char;
 
-  const imgStyle = thumbnail.toLowerCase().includes('image_not_available.jpg')
+  const imgStyle = thumbnail?.toLowerCase().includes('image_not_available.jpg')
     ? { objectFit: 'contain' }
     : { objectFit: 'cover' };
 

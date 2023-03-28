@@ -3,7 +3,7 @@ import './charList.scss';
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
 import Spinner from '../Spinner/Spinner';
@@ -11,44 +11,31 @@ import Spinner from '../Spinner/Spinner';
 const CharList = (props) => {
   const { onCharSelected } = props;
 
+  const { loading, error, getAllCharacters } = useMarvelService();
+
   const [charList, setCharList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [offset, setOffset] = useState(false);
+  const [offset, setOffset] = useState(210);
   const [additionalCharLoading, setAdditionalCharLoading] = useState(false);
   const [charListDone, setCharListDone] = useState(false);
 
-  const marvelService = new MarvelService();
-
   useEffect(() => {
-    onRequest();
+    onRequest(offset, true);
     // eslint-disable-next-line
   }, []);
-
-  const onCharListLoading = () => {
-    setAdditionalCharLoading(true);
-  };
 
   const onCharListLoaded = (newCharList = []) => {
     const charListDone = newCharList.length < 9 ? true : false;
     setCharList((charList) => [...charList, ...newCharList]);
-    setLoading(false);
+
     setOffset((offset) => offset + 9);
     setAdditionalCharLoading(false);
     setCharListDone(charListDone);
   };
 
-  const onError = () => {
-    setLoading(false);
-    setError(true);
-  };
+  const onRequest = (offset, initial) => {
+    initial ? setAdditionalCharLoading(false) : setAdditionalCharLoading(true);
 
-  const onRequest = (offset) => {
-    onCharListLoading();
-    marvelService
-      .getAllCharacters(offset)
-      .then((response) => onCharListLoaded(response))
-      .catch(onError);
+    getAllCharacters(offset).then((response) => onCharListLoaded(response));
   };
 
   const charRefs = useRef([]);
@@ -66,7 +53,7 @@ const CharList = (props) => {
   const renderItems = (arr) => {
     const items = arr.map((item, index) => {
       const imgStyle = item.thumbnail
-        .toLowerCase()
+        ?.toLowerCase()
         .includes('image_not_available.jpg')
         ? { objectFit: 'unset' }
         : { objectFit: 'cover' };
@@ -100,8 +87,7 @@ const CharList = (props) => {
   const items = renderItems(charList);
 
   const errorMessage = error ? <ErrorMessage /> : null;
-  const spinner = loading ? <Spinner /> : null;
-  const content = !(loading || error) ? items : null;
+  const spinner = loading && !additionalCharLoading ? <Spinner /> : null;
 
   const btnStyle = charListDone ? { display: 'none' } : { display: 'block' };
 
@@ -109,12 +95,12 @@ const CharList = (props) => {
     <div className='char__list'>
       {errorMessage}
       {spinner}
-      {content}
+      {items}
       <button
         style={btnStyle}
         className='button button__main button__long'
         disabled={additionalCharLoading}
-        onClick={() => onRequest(offset)}
+        onClick={() => onRequest(offset, false)}
       >
         <div className='inner'>load more</div>
       </button>
