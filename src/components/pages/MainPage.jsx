@@ -4,7 +4,7 @@ import RandomChar from '../RandomChar/RandomChar';
 import CharList from '../CharList/CharList';
 import CharInfo from '../CharInfo/CharInfo';
 
-import ErrorBoundary from '../errorBoundary/ErrorBoundary';
+import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
 
 // import decoration from '../../resources/img/vision.png';
 
