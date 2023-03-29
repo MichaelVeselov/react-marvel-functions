@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 
 import useMarvelService from '../../services/MarvelService';
 
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
+import Spinner from '../Spinner/Spinner';
+import ErrorMessage from '../ErrorMessage/ErrorMessage';
 
 const ComicsList = () => {
   const { loading, error, getAllComics } = useMarvelService();
