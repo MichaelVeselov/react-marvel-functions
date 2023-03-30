@@ -6,8 +6,6 @@ import CharInfo from '../CharInfo/CharInfo';
 
 import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
 
-// import decoration from '../../resources/img/vision.png';
-
 const MainPage = () => {
   const [selectedChar, setSelectedChar] = useState(null);
 
@@ -28,7 +26,6 @@ const MainPage = () => {
           <CharInfo charId={selectedChar} />
         </ErrorBoundary>
       </div>
-      {/* <img className='bg-decoration' src={decoration} alt='vision' /> */}
     </>
   );
 };

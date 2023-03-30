@@ -1,29 +1,32 @@
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { lazy } from 'react';
 
-import AppHeader from '../AppHeader/AppHeader';
-import { MainPage, ComicsPage } from '../pages';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
-// import decoration from '../../resources/img/vision.png';
+import Layout from '../pages/Layout';
+
+const Page404 = lazy(() => import('../pages/404'));
+const MainPage = lazy(() => import('../pages/MainPage'));
+const ComicsPage = lazy(() => import('../pages/ComicsPage'));
+const SingleComicPage = lazy(() =>
+  import('../pages/SingleComicPage/SingleComicPage')
+);
 
 const App = () => {
-  return (
-    <Router>
-      <div className='app'>
-        <AppHeader />
-        <main>
-          <Switch>
-            <Route exact path='/'>
-              <MainPage />
-            </Route>
-            <Route exact path='/comics'>
-              <ComicsPage />
-            </Route>
-          </Switch>
-          {/* <img className='bg-decoration' src={decoration} alt='vision' /> */}
-        </main>
-      </div>
-    </Router>
-  );
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <Layout />,
+      errorElement: '',
+      children: [
+        { index: true, element: <MainPage /> },
+        { path: '/comics', element: <ComicsPage /> },
+        { path: '/comics/:comicId', element: <SingleComicPage /> },
+        { path: '*', element: <Page404 /> },
+      ],
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
 };
 
 export default App;

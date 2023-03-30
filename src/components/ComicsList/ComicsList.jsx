@@ -2,6 +2,8 @@ import './comicsList.scss';
 
 import { useState, useEffect } from 'react';
 
+import { Link } from 'react-router-dom';
+
 import useMarvelService from '../../services/MarvelService';
 
 import Spinner from '../Spinner/Spinner';
@@ -40,8 +42,9 @@ const ComicsList = () => {
   function renderItems(comicsList) {
     const items = comicsList.map((item, index) => {
       return (
+        //Index as key because of the API returns items with the same ID
         <li className='comics__item' key={index}>
-          <a href='#/'>
+          <Link to={`/comics/${item.id}`}>
             <img
               src={item.thumbnail}
               alt={item.title}
@@ -49,7 +52,7 @@ const ComicsList = () => {
             />
             <div className='comics__item-name'>{item.title}</div>
             <div className='comics__item-price'>{item.price}</div>
-          </a>
+          </Link>
         </li>
       );
     });
