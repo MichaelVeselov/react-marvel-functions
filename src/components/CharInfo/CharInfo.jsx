@@ -13,12 +13,12 @@ import Skeleton from '../Skeleton/Skeleton';
 const CharInfo = (props) => {
   const { charId } = props;
 
-  const { loading, error, getCharacter, clearError } = useMarvelService();
+  const { loading, error, getCharacterById, clearError } = useMarvelService();
 
   const [char, setChar] = useState(null);
 
   useEffect(() => {
-    updateChar();
+    getChar();
     // eslint-disable-next-line
   }, [charId]);
 
@@ -26,12 +26,12 @@ const CharInfo = (props) => {
     setChar(char);
   };
 
-  const updateChar = () => {
+  const getChar = () => {
     if (!charId) return;
 
     clearError();
 
-    getCharacter(charId).then((response) => onCharLoaded(response));
+    getCharacterById(charId).then((response) => onCharLoaded(response));
   };
 
   const skeleton = char || loading || error ? null : <Skeleton />;

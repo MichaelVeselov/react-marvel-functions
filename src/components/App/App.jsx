@@ -7,9 +7,14 @@ import Layout from '../pages/Layout';
 const Page404 = lazy(() => import('../pages/404'));
 const MainPage = lazy(() => import('../pages/MainPage'));
 const ComicsPage = lazy(() => import('../pages/ComicsPage'));
-const SingleComicPage = lazy(() =>
-  import('../pages/SingleComicPage/SingleComicPage')
+
+const SingleComicLayout = lazy(() =>
+  import('../pages/SingleComicLayout/SingleComicLayout')
 );
+const SingleCharacterLayout = lazy(() =>
+  import('../pages/SingleCharacterLayout/SingleCharacterLayout')
+);
+const SinglePage = lazy(() => import('../pages/SinglePage'));
 
 const App = () => {
   const router = createBrowserRouter([
@@ -20,7 +25,21 @@ const App = () => {
       children: [
         { index: true, element: <MainPage /> },
         { path: '/comics', element: <ComicsPage /> },
-        { path: '/comics/:comicId', element: <SingleComicPage /> },
+        {
+          path: '/comics/:id',
+          element: (
+            <SinglePage Component={SingleComicLayout} dataType='comic' />
+          ),
+        },
+        {
+          path: '/character/:id',
+          element: (
+            <SinglePage
+              Component={SingleCharacterLayout}
+              dataType='character'
+            />
+          ),
+        },
         { path: '*', element: <Page404 /> },
       ],
     },

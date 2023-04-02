@@ -11,12 +11,12 @@ import mjolnir from '../../resources/img/mjolnir.png';
 
 const RandomChar = () => {
   const [char, setChar] = useState({});
-  const { loading, error, getCharacter, clearError } = useMarvelService();
+  const { loading, error, getCharacterById, clearError } = useMarvelService();
 
   useEffect(() => {
-    updateChar();
+    getChar();
 
-    const timerId = setInterval(updateChar, 60 * 1000);
+    const timerId = setInterval(getChar, 60 * 1000);
     return () => {
       clearInterval(timerId);
     };
@@ -27,10 +27,10 @@ const RandomChar = () => {
     setChar(char);
   };
 
-  const updateChar = () => {
+  const getChar = () => {
     clearError();
     const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-    getCharacter(id).then((response) => onCharLoaded(response));
+    getCharacterById(id).then((response) => onCharLoaded(response));
   };
 
   const errorMessage = error ? <ErrorMessage /> : null;
@@ -49,7 +49,7 @@ const RandomChar = () => {
           Do you want to get to know him better?
         </p>
         <p className='randomchar__title'>Or choose another one</p>
-        <button className='button button__main' onClick={updateChar}>
+        <button className='button button__main' onClick={getChar}>
           <div className='inner'>try it</div>
         </button>
         <img src={mjolnir} alt='mjolnir' className='randomchar__decoration' />

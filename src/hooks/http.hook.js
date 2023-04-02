@@ -8,13 +8,16 @@ const useHttp = () => {
     async (
       url,
       method = 'GET',
+      mode = 'cors',
       body = null,
-      headers = { 'Content-Type': 'application/json' }
+      headers = {
+        'Content-Type': 'application/json',
+      }
     ) => {
       setLoading(true);
 
       try {
-        const response = await fetch(url, { method, body, headers });
+        const response = await fetch(url, { method, mode, body, headers });
 
         if (!response.ok) {
           throw new Error(`Could not fetch ${url}, status: ${response.status}`);

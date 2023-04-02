@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 
 import { Link } from 'react-router-dom';
 
+import { v4 as uuidv4 } from 'uuid';
+
 import useMarvelService from '../../services/MarvelService';
 
 import Spinner from '../Spinner/Spinner';
@@ -36,14 +38,20 @@ const ComicsList = () => {
       ? setAdditionalComicsLoading(false)
       : setAdditionalComicsLoading(true);
 
-    getAllComics(offset).then((response) => onComicsListLoaded(response));
+    getAllComics(offset).then((response) => {
+      const data = response.map((item) => {
+        const uniqId = uuidv4();
+        return { ...item, uniqId };
+      });
+      onComicsListLoaded(data);
+    });
   };
 
   function renderItems(comicsList) {
-    const items = comicsList.map((item, index) => {
+    const items = comicsList.map((item) => {
       return (
         //Index as key because of the API returns items with the same ID
-        <li className='comics__item' key={index}>
+        <li className='comics__item' key={item.uniqId}>
           <Link to={`/comics/${item.id}`}>
             <img
               src={item.thumbnail}
