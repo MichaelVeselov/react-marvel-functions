@@ -4,14 +4,14 @@ import { useState, useEffect } from 'react';
 
 import useMarvelService from '../../services/MarvelService.js';
 
-import Spinner from '../Spinner/Spinner';
-import ErrorMessage from '../ErrorMessage/ErrorMessage';
+import setContent from '../../utils/setContent';
 
 import mjolnir from '../../resources/img/mjolnir.png';
 
 const RandomChar = () => {
   const [char, setChar] = useState({});
-  const { loading, error, getCharacterById, clearError } = useMarvelService();
+  const { process, setProcess, getCharacterById, clearError } =
+    useMarvelService();
 
   useEffect(() => {
     getChar();
@@ -30,18 +30,14 @@ const RandomChar = () => {
   const getChar = () => {
     clearError();
     const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-    getCharacterById(id).then((response) => onCharLoaded(response));
+    getCharacterById(id)
+      .then((response) => onCharLoaded(response))
+      .then(() => setProcess('confirmed'));
   };
-
-  const errorMessage = error ? <ErrorMessage /> : null;
-  const spinner = loading ? <Spinner /> : null;
-  const content = !(error || loading) ? <View char={char} /> : null;
 
   return (
     <div className='randomchar'>
-      {errorMessage}
-      {spinner}
-      {content}
+      {setContent(process, View, char)}
       <div className='randomchar__static'>
         <p className='randomchar__title'>
           Random character for today!
@@ -58,8 +54,9 @@ const RandomChar = () => {
   );
 };
 
-const View = ({ char }) => {
-  const { name, description, thumbnail, homepage, wiki } = char;
+const View = (props) => {
+  const { data } = props;
+  const { name, description, thumbnail, homepage, wiki } = data;
 
   const imgStyle = thumbnail?.toLowerCase().includes('image_not_available.jpg')
     ? { objectFit: 'contain' }

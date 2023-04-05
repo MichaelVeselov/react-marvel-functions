@@ -11,8 +11,23 @@ import useMarvelService from '../../services/MarvelService';
 import Spinner from '../Spinner/Spinner';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
 
+const setContent = (process, Component, additionalComicsLoading) => {
+  switch (process) {
+    case 'waiting':
+      return <Spinner />;
+    case 'loading':
+      return additionalComicsLoading ? <Component /> : <Spinner />;
+    case 'confirmed':
+      return <Component />;
+    case 'error':
+      return <ErrorMessage />;
+    default:
+      throw new Error('Unexpected process state...');
+  }
+};
+
 const ComicsList = () => {
-  const { loading, error, getAllComics } = useMarvelService();
+  const { process, setProcess, getAllComics } = useMarvelService();
 
   const [comicsList, setComicsList] = useState([]);
   const [offset, setOffset] = useState(0);
@@ -38,19 +53,20 @@ const ComicsList = () => {
       ? setAdditionalComicsLoading(false)
       : setAdditionalComicsLoading(true);
 
-    getAllComics(offset).then((response) => {
-      const data = response.map((item) => {
-        const uniqId = uuidv4();
-        return { ...item, uniqId };
-      });
-      onComicsListLoaded(data);
-    });
+    getAllComics(offset)
+      .then((response) => {
+        const data = response.map((item) => {
+          const uniqId = uuidv4();
+          return { ...item, uniqId };
+        });
+        onComicsListLoaded(data);
+      })
+      .then(() => setProcess('confirmed'));
   };
 
   function renderItems(comicsList) {
     const items = comicsList.map((item) => {
       return (
-        //Index as key because of the API returns items with the same ID
         <li className='comics__item' key={item.uniqId}>
           <Link to={`/comics/${item.id}`}>
             <img
@@ -68,18 +84,15 @@ const ComicsList = () => {
     return <ul className='comics__grid'>{items}</ul>;
   }
 
-  const items = renderItems(comicsList);
-
-  const errorMessage = error ? <ErrorMessage /> : null;
-  const spinner = loading && !additionalComicsLoading ? <Spinner /> : null;
-
   const btnStyle = comicsListDone ? { display: 'none' } : { display: 'block' };
 
   return (
     <div className='comics__list'>
-      {errorMessage}
-      {spinner}
-      {items}
+      {setContent(
+        process,
+        () => renderItems(comicsList),
+        additionalComicsLoading
+      )}
       <button
         disabled={additionalComicsLoading}
         style={btnStyle}
